@@ -42,6 +42,7 @@ module.exports = (app) => {
 
 async function dismissPullRequest (context) {
   // Dismiss the PR
+  context.log(context);
   const prParams = context.pullRequest({ reviewers: ['influscopeTu']})
   await context.octokit.pulls.requestReviewers(prParams)
 }
