@@ -4,7 +4,7 @@
  */
 module.exports = (app) => {
   // Your code here
-  app.log.info("The app was loaded!");
+  app.log.info("Yay, the app was loaded!");
 
   app.on("issues.opened", async (context) => {
     const issueComment = context.issue({
@@ -33,7 +33,7 @@ module.exports = (app) => {
 
     //Approve the PR
     dismissPullRequest(context);
-    context.log("PR dismissed.");
+    context.log("PR dismissed");
 
   });
 
@@ -42,8 +42,8 @@ module.exports = (app) => {
 
 async function dismissPullRequest (context) {
   // Dismiss the PR
-  const prParams = context.requestReviewers({ team_reviewers: 'influscopeTu'})
-  await context.octokit.pulls.createReview(prParams)
+  const prParams = context.pullRequest({ reviewers: 'influscopeTu'})
+  await context.octokit.pulls.requestReviewers(prParams)
 }
 
 async function approvePullRequest (context) {
