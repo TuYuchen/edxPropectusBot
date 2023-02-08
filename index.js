@@ -31,7 +31,7 @@ module.exports = (app) => {
     });
     context.log("Reacted with -1");
     const issueComment = context.issue({
-      body: "Your PR was dismissed due to recent update.",
+      body: "Your PR was dismissed due to recent update",
     });
     await context.octokit.issues.createComment(issueComment);
 
