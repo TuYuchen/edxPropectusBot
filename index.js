@@ -17,7 +17,7 @@ module.exports = (app) => {
     context.log("The PR was updated recently.");
 
     // const prUser = context.payload.issue.user.login;
-    context.log(context.payload);
+    // context.log(context.payload);
     if (context.isBot) {
       // Ignore update if this issue was created by the bot
       context.log("This push was created by the bot");
@@ -32,7 +32,7 @@ module.exports = (app) => {
     // await context.octokit.issues.createComment(issueComment);
 
     //Approve the PR
-    approvePullRequest(context);
+    dismissPullRequest(context);
     context.log("PR dismissed");
 
   });
@@ -42,7 +42,7 @@ module.exports = (app) => {
 
 async function dismissPullRequest (context) {
   // Dismiss the PR
-  const prParams = context.pullRequest({ event: 'REQUEST_CHANGES' })
+  const prParams = context.requestReviewers({ team_reviewers: 'influscopeTu'})
   await context.octokit.pulls.createReview(prParams)
 }
 
