@@ -13,7 +13,7 @@ module.exports = (app) => {
     return context.octokit.issues.createComment(issueComment);
   });
 
-  app.on(["pull_request.opened", "pull_request.edited"], async (context) => {
+  app.on(["pull_request.opened", "pull_request.edited", "pull_request.synchronize"], async (context) => {
     context.log("issue_comment.created or issue_comment.edited");
 
     if (context.isBot) {
@@ -31,7 +31,7 @@ module.exports = (app) => {
     });
     context.log("Reacted with -1");
     const issueComment = context.issue({
-      body: "Your PR was dismissed due to recent update",
+      body: "Your PR was dismissed due to recent update/s.",
     });
     await context.octokit.issues.createComment(issueComment);
 
