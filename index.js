@@ -4,7 +4,7 @@
  */
 module.exports = (app) => {
   // Your code here
-  app.log.info("Yay, the app was loaded!");
+  app.log.info("The app was loaded!");
 
   app.on("issues.opened", async (context) => {
     const issueComment = context.issue({
