@@ -33,7 +33,7 @@ module.exports = (app) => {
 
     //Approve the PR
     dismissPullRequest(context);
-    context.log("PR dismissed");
+    context.log("PR dismissed.");
 
   });
 
