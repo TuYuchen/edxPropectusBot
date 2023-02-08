@@ -45,7 +45,7 @@ async function dismissPullRequest (context) {
   const prParams = context.pullRequest({ reviewers: ['influscopeTu']})
   await context.octokit.pulls.requestReviewers(prParams)
 
-  let a = await context.octokit.pulls.listRequestedReviewers(context.pullRequest())
+  let a = await context.octokit.pulls.listReviews(context.pullRequest())
   context.log(a);
 }
 
