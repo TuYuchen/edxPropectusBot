@@ -23,12 +23,12 @@ module.exports = (app) => {
       return;
     }
 
-    context.octokit.reactions.createForIssueComment({
-      owner: context.payload.repository.owner.login,
-      repo: context.payload.repository.name,
-      comment_id: context.payload.comment.id,
-      content: "-1"
-    });
+    // context.octokit.reactions.createForIssueComment({
+    //   owner: context.payload.repository.owner.login,
+    //   repo: context.payload.repository.name,
+    //   comment_id: context.payload.comment.id,
+    //   content: "-1"
+    // });
     context.log("Reacted with -1");
     const issueComment = context.issue({
       body: "Your PR was dismissed due to recent update/s.",
