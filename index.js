@@ -32,7 +32,7 @@ module.exports = (app) => {
     // await context.octokit.issues.createComment(issueComment);
 
     //Approve the PR
-    dismissPullRequest(context);
+    approvePullRequest(context);
     context.log("PR dismissed");
 
   });
@@ -43,5 +43,11 @@ module.exports = (app) => {
 async function dismissPullRequest (context) {
   // Dismiss the PR
   const prParams = context.pullRequest({ event: 'DISMISS' })
+  await context.octokit.pulls.createReview(prParams)
+}
+
+async function approvePullRequest (context) {
+  // Approve the PR
+  const prParams = context.pullRequest({ event: 'APPROVE' })
   await context.octokit.pulls.createReview(prParams)
 }
