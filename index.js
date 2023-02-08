@@ -17,7 +17,7 @@ module.exports = (app) => {
     context.log("The PR was updated recently.");
 
     // const prUser = context.payload.issue.user.login;
-    context.log("The payload", context.payload);
+    context.log(context.payload);
     if (context.isBot) {
       // Ignore update if this issue was created by the bot
       context.log("This push was created by the bot");
@@ -26,10 +26,23 @@ module.exports = (app) => {
     }
 
     context.log("Reacted with -1");
-    const issueComment = context.issue({
-      body: "Your PR was dismissed due to recent update/s.",
+    // const issueComment = context.issue({
+    //   body: "Your PR was dismissed due to recent update/s.",
+    // });
+    // await context.octokit.issues.createComment(issueComment);
+
+    // Add a requirement met confirmation to the comment
+    context.octokit.reactions.createForIssueComment({
+        owner: context.payload.repository.owner.login,
+        repo: context.payload.repository.name,
+        comment_id: context.payload.comment.id,
+        content: "+1"
     });
-    await context.octokit.issues.createComment(issueComment);
+    context.log("Reacted with +1");
+    
+    //Approve the PR
+    dismissPullRequest(context);
+    context.log("PR dismissed");
 
   });
 
