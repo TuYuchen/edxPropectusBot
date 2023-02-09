@@ -59,6 +59,8 @@ async function dismissPullRequest (context) {
 
       // await context.octokit.pulls.dismissReview(reviewParams)
     }
+    let reviewParams = context.pullRequest({ review_id: ids[0] })
+    await context.octokit.pulls.dismissReview(reviewParams)
     context.log(ids);
   }
 
