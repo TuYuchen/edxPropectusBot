@@ -26,13 +26,13 @@ module.exports = (app) => {
     }
 
     context.log("Reacted with -1");
-    // const issueComment = context.issue({
-    //   body: "Your PR was dismissed due to recent update/s.",
-    // });
-    // await context.octokit.issues.createComment(issueComment);
+    const issueComment = context.issue({
+      body: "Your PR was dismissed due to recent update/s.",
+    });
+    await context.octokit.issues.createComment(issueComment);
 
     //Approve the PR
-    dismissPullRequest(context);
+    // dismissPullRequest(context);
     context.log("PR dismissed");
 
   });
