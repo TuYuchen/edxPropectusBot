@@ -50,11 +50,12 @@ async function dismissPullRequest (context) {
   let ids = [];
   if (reviewData?.length>0) {
     for (let i = 0; i < allReviews.length; i++) {
+      context.log(reviewData[i]);
       ids.push(reviewData[i].id);
     }
   }
-  context.log(reviewData);
-  context.log(ids);
+  // context.log(reviewData);
+  // context.log(ids);
 }
 
 async function approvePullRequest (context) {
