@@ -52,7 +52,7 @@ async function dismissPullRequest (context) {
       ids.push(allReviews[0]);
     }
   }
-  context.log('allReviews', allReviews);
+  context.log('allReview', allReviews);
 }
 
 async function approvePullRequest (context) {
