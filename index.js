@@ -48,7 +48,7 @@ async function dismissPullRequest (context) {
   let allReviews = await context.octokit.pulls.listReviews(context.pullRequest());
   let reviewData = allReviews?.data;
   let ids = [];
-  if (reviewData?.length>0) {
+  if (reviewData) {
     for (let i = 0; i < allReviews.length; i++) {
       context.log(reviewData[i]);
       ids.push(reviewData[i].id);
