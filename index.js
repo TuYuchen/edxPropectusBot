@@ -42,7 +42,7 @@ module.exports = (app) => {
 
 async function dismissPullRequest (context) {
   // Dismiss the PR
-  const prParams = context.pullRequest({ reviewers: ['influscopeTu']})
+  // const prParams = context.pullRequest({ reviewers: ['influscopeTu']})
   // await context.octokit.pulls.requestReviewers(prParams)
 
   let allReviews = await context.octokit.pulls.listReviews(context.pullRequest());
@@ -52,7 +52,7 @@ async function dismissPullRequest (context) {
       ids.push(allReviews[0]);
     }
   }
-  context.log(ids);
+  context.log('ids', ids);
 }
 
 async function approvePullRequest (context) {
