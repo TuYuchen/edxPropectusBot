@@ -49,9 +49,14 @@ async function dismissPullRequest (context) {
   let reviewData = allReviews?.data;
   if (reviewData?.length > 0) {
     for (let i = 0; i < reviewData.length; i++) {
-      let reviewParams = context.pullRequest({ review_id: reviewData[i].id })
-      context.log(reviewParams);
-      await context.octokit.pulls.dismissReview(reviewParams)
+      // let reviewParams = context.pullRequest({ review_id: reviewData[i].id })
+      // context.log(reviewParams);
+      const issueComment = context.issue({
+        body: reviewData[i].id,
+      });
+      await context.octokit.issues.createComment(issueComment);
+
+      // await context.octokit.pulls.dismissReview(reviewParams)
     }
   }
 
