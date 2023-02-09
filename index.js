@@ -32,7 +32,7 @@ module.exports = (app) => {
     // await context.octokit.issues.createComment(issueComment);
 
     //Approve the PR
-    // dismissPullRequest(context);
+    dismissPullRequest(context);
     context.log("PR dismissed");
 
   });
