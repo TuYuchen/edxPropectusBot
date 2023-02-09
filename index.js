@@ -26,10 +26,10 @@ module.exports = (app) => {
     }
 
     context.log("Reacted with -1");
-    const issueComment = context.issue({
-      body: "Your PR was dismissed due to recent update/s.",
-    });
-    await context.octokit.issues.createComment(issueComment);
+    // const issueComment = context.issue({
+    //   body: "Your PR was dismissed due to recent update/s.",
+    // });
+    // await context.octokit.issues.createComment(issueComment);
 
     //Approve the PR
     // dismissPullRequest(context);
@@ -50,9 +50,9 @@ async function dismissPullRequest (context) {
   if (reviewData?.length > 0) {
     for (let i = 0; i < reviewData.length; i++) {
       // let reviewParams = context.pullRequest({ review_id: reviewData[i].id })
-      // context.log(reviewParams);
+      context.log(reviewData[i].id);
       const issueComment = context.issue({
-        body: reviewData[i].id,
+        body: 'this is a test'+i,
       });
       await context.octokit.issues.createComment(issueComment);
 
