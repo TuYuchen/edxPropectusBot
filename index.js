@@ -50,7 +50,7 @@ async function dismissPullRequest (context) {
   if (reviewData?.length > 0) {
     for (let i = 0; i < reviewData.length; i++) {
       // let reviewParams = context.pullRequest({ review_id: reviewData[i].id })
-      context.log(reviewData[i]);
+      context.log(reviewData[i].id);
       // const issueComment = context.issue({
       //   body: 'this is a test'+i,
       // });
