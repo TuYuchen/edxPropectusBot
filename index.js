@@ -73,11 +73,7 @@ async function approvePullRequest (context) {
 }
 
 const getExistingReview = async (context) => {
-  const reviews = await context.octokit.pulls.listReviews({
-      owner: context.payload.repository.owner.login,
-      repo: context.payload.repository.name,
-      pull_number: context.payload.number,
-  });
+  const reviews = await context.octokit.pulls.listReviews(context.pullRequest());
   context.log(`reviews`, reviews);
   return reviews.data.find((review) => {
       return (review.user != null &&
