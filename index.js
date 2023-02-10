@@ -74,7 +74,7 @@ async function approvePullRequest (context) {
 
 const getExistingReview = async (context) => {
   const reviews = await context.octokit.pulls.listReviews(context.pullRequest());
-  context.log(`reviews`, reviews);
+  context.log(`reviews`, context);
   return reviews.data.find((review) => {
       return (review.user != null &&
           isGitHubActionUser(review.user.login) &&
