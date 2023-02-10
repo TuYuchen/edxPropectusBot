@@ -45,18 +45,19 @@ async function dismissPullRequest (context) {
   let allReviews = await context.octokit.pulls.listReviews(context.pullRequest());
   let reviewData = allReviews?.data;
   // let reviewData = validateReviews(rowReviews)
-  context.log(reviewData);
   let ids = []
   if (reviewData?.length > 0) {
     for (let i = 0; i < reviewData.length; i++) {
       ids.push(reviewData[i].id)
-      await context.octokit.pulls.dismissReview({
-        owner: context.payload.repository.owner.login,
-        repo: context.payload.repository.name,
-        pull_number: context.payload.number,
-        review_id: reviewData[i].id,
-        message: 'Dismissed reviews due to recent update',
-      })
+      if(reviewData[i].state === 'APPROVED' && reviewData[i].user.type === 'User') {
+        await context.octokit.pulls.dismissReview({
+          owner: context.payload.repository.owner.login,
+          repo: context.payload.repository.name,
+          pull_number: context.payload.number,
+          review_id: reviewData[i].id,
+          message: 'Dismissed reviews due to recent update',
+        })
+      }
     }
     context.log(ids);
   } else {
