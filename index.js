@@ -31,9 +31,8 @@ module.exports = (app) => {
     // await context.octokit.issues.createComment(issueComment);
 
     //Approve the PR
-    dismissPullRequest(context);
-    // dismissReview(context);
-    context.log("PR dismissed");
+    // dismissPullRequest(context);
+    dismissReview(context);
 
   });
 
@@ -74,8 +73,8 @@ async function approvePullRequest (context) {
 }
 
 const getExistingReview = async (context) => {
-  const reviews = await context.octokit.pulls.listReviews(context.pullRequest());
   context.log(`reviews`, context);
+  const reviews = await context.octokit.pulls.listReviews(context.pullRequest());
   return reviews.data.find((review) => {
       return (review.user != null &&
           isGitHubActionUser(review.user.login) &&
@@ -92,7 +91,7 @@ const hasReviewedState = (state) => {
 };
 
 const dismissReview = async (context) => {
-  context.log(`Trying to get existing review`);
+  context.log(`Trying to get existing review`, context);
   const review = await getExistingReview(context);
   if (review === undefined) {
       context.log("Found no existing review");
