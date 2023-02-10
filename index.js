@@ -26,7 +26,7 @@ module.exports = (app) => {
     const comment = context.payload.comment.body;
     context.log("Comment: " + comment);
 
-    if (comment !== 'Self-Aprove!') {
+    if (comment !== 'Self-Approve!') {
       // Ignore comments if this issue is not a PR
       context.log("Is not Force Merge!");
       context.log("Execution finished\n\n");
