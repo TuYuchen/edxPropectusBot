@@ -32,8 +32,8 @@ module.exports = (app) => {
     // await context.octokit.issues.createComment(issueComment);
 
     //Approve the PR
-    dismissPullRequest(context);
-    // dismissReview();
+    // dismissPullRequest(context);
+    dismissReview(context);
     context.log("PR dismissed");
 
   });
@@ -73,11 +73,11 @@ async function approvePullRequest (context) {
   await context.octokit.pulls.createReview(prParams)
 }
 
-const getExistingReview = async (pullRequest) => {
+const getExistingReview = async (context) => {
   const reviews = await octokit.rest.pulls.listReviews({
-      owner: pullRequest.owner,
-      repo: pullRequest.repo,
-      pull_number: pullRequest.number,
+      owner: context.payload.repository.owner,
+      repo: context.payload.repository.repo,
+      pull_number: context.payload.repository.number,
   });
 
   return reviews.data.find((review) => {
@@ -95,30 +95,30 @@ const hasReviewedState = (state) => {
   return state === "CHANGES_REQUESTED" || state === "COMMENTED";
 };
 
-const dismissReview = async (pullRequest) => {
+const dismissReview = async (context) => {
   context.log(`Trying to get existing review`);
-  const review = await getExistingReview(pullRequest);
+  const review = await getExistingReview(context);
   if (review === undefined) {
       context.log("Found no existing review");
       return;
   }
   if (review.state === "COMMENTED") {
       await octokit.rest.pulls.updateReview({
-          owner: pullRequest.owner,
-          repo: pullRequest.repo,
-          pull_number: pullRequest.number,
+          owner: context.payload.repository.owner,
+          repo: context.payload.repository.repo,
+          pull_number: context.payload.repository.number,
           review_id: review.id,
-          body: onSucceededRegexDismissReviewComment,
+          body: 'Updated existing review',
       });
       context.log(`Updated existing review`);
   }
   else {
       await octokit.rest.pulls.dismissReview({
-          owner: pullRequest.owner,
-          repo: pullRequest.repo,
-          pull_number: pullRequest.number,
+          owner: context.payload.repository.owner,
+          repo: context.payload.repository.repo,
+          pull_number: context.payload.repository.number,
           review_id: review.id,
-          message: onSucceededRegexDismissReviewComment,
+          message: 'Dismissed existing review',
       });
       context.log(`Dismissed existing review`);
   }
