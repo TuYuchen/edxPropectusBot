@@ -6,11 +6,93 @@ module.exports = (app) => {
   // Your code here
   app.log.info("The app was loaded!");
 
-  app.on("issues.opened", async (context) => {
-    const issueComment = context.issue({
-      body: "Thanks for opening this issue!",
-    });
-    return context.octokit.issues.createComment(issueComment);
+  // Force merge method
+  app.on(["issue_comment.created", "issue_comment.edited"], async (context) => { 
+    if (context.isBot) {
+      // Ignore comments if this issue was created by the bot=
+      context.log("This comment was created by the bot");
+      context.log("Execution finished\n\n");
+      return;
+    }
+    
+    if (!context.payload.issue.pull_request) {
+      // Ignore comments if this issue is not a PR
+      context.log("This comment is not created in a PR");
+      context.log("Execution finished\n\n");
+      return;
+    }
+
+    // Get the content of the comment
+    const comment = context.payload.comment.body;
+    context.log("Comment: " + comment);
+
+    if (comment === 'Force Merge!') {
+      // Ignore comments if this issue is not a PR
+      context.log("Is not Force Merge!");
+      context.log("Execution finished\n\n");
+      return;
+    }
+    // Get the author of the PR and the comment
+    const prUser = context.payload.issue.user.login;
+    context.log("PR User: " + prUser);
+    const reviewUser = context.payload.comment.user.login;
+    context.log("Review User: " + reviewUser);
+    // Check if they are the same user
+    if (prUser !== reviewUser) {
+      context.log("Not the same user");
+      // If they are different users, tell the user that they are not allowed to self-approve this PR
+      context.octokit.reactions.createForIssueComment({
+        owner: context.payload.repository.owner.login,
+        repo: context.payload.repository.name,
+        comment_id: context.payload.comment.id,
+        content: "-1"
+      });
+      context.log("Reacted with -1");
+      const issueComment = context.issue({
+        body: "You are not allowed to self-approve others Pull Request!",
+      });
+      await context.octokit.issues.createComment(issueComment);
+      context.log("Not allowed comment sent");
+      context.log("Execution finished\n\n");
+      return;
+    }
+    context.log("Same user");
+
+
+   // Check if the user is in the whitelist
+   const userSatisfied = config.from_author.length === 0 || config.from_author.includes(prUser);
+   if (!userSatisfied) {
+     context.log("User not in whitelist");
+     // If the user is not in the whitelist, tell the user that they are not allowed to use this command
+     context.octokit.reactions.createForIssueComment({
+       owner: context.payload.repository.owner.login,
+       repo: context.payload.repository.name,
+       comment_id: context.payload.comment.id,
+       content: "-1"
+     });
+     context.log("Reacted with -1");
+     const issueComment = context.issue({
+       body: "You are not allowed to use this command!",
+     });
+     await context.octokit.issues.createComment(issueComment);
+     context.log("Not allowed comment sent");
+     context.log("Execution finished\n\n");
+     return;
+   }
+   context.log("User in whitelist");
+
+   // Add a requirement met confirmation to the comment
+   context.octokit.reactions.createForIssueComment({
+     owner: context.payload.repository.owner.login,
+     repo: context.payload.repository.name,
+     comment_id: context.payload.comment.id,
+     content: "+1"
+   });
+   context.log("Reacted with +1");
+
+   //Approve the PR
+   approvePullRequest(context);
+
   });
 
   app.on(["pull_request.opened", "pull_request.edited", "pull_request.synchronize"], async (context) => {
@@ -22,29 +104,16 @@ module.exports = (app) => {
       context.log("Execution finished\n\n");
       return;
     }
-
-    // const issueComment = context.issue({
-    //   body: "Your PR was dismissed due to recent update/s.",
-    // });
-    // await context.octokit.issues.createComment(issueComment);
-
-    //Approve the PR
     dismissPullRequest(context);
-    // dismissReview(context);
-
   });
 
 };
 
-
 async function dismissPullRequest (context) {
   // Dismiss the PR
-  // const prParams = context.pullRequest({ reviewers: ['influscopeTu']})
-  // await context.octokit.pulls.requestReviewers(prParams)
- 
   let allReviews = await context.octokit.pulls.listReviews(context.pullRequest());
   let reviewData = allReviews?.data;
-  // let reviewData = validateReviews(rowReviews)
+
   let ids = []
   if (reviewData?.length > 0) {
     for (let i = 0; i < reviewData.length; i++) {
@@ -71,12 +140,3 @@ async function approvePullRequest (context) {
   const prParams = context.pullRequest({ event: 'APPROVE' })
   await context.octokit.pulls.createReview(prParams)
 }
-
-const validateReviews = async (reviews) => {
-  let review = reviews.filter((review) => { review.user.type !==  "Bot" && review.state === "APPROVED"})
-  return review;
-};
-
-const hasReviewedState = (state) => {
-  return state === "CHANGES_REQUESTED" || state === "COMMENTED";
-};
