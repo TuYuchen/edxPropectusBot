@@ -25,7 +25,6 @@ module.exports = (app) => {
       return;
     }
 
-    context.log("Reacted with -1");
     // const issueComment = context.issue({
     //   body: "Your PR was dismissed due to recent update/s.",
     // });
@@ -75,11 +74,11 @@ async function approvePullRequest (context) {
 
 const getExistingReview = async (context) => {
   const reviews = await context.octokit.pulls.listReviews({
-      owner: context.payload.repository.owner,
-      repo: context.payload.repository.repo,
-      pull_number: context.payload.repository.number,
+      owner: context.payload.repository.owner.login,
+      repo: context.payload.repository.repo.name,
+      pull_number: context.payload.number,
   });
-
+  context.log(`reviews`, reviews);
   return reviews.data.find((review) => {
       return (review.user != null &&
           isGitHubActionUser(review.user.login) &&
@@ -104,9 +103,9 @@ const dismissReview = async (context) => {
   }
   if (review.state === "COMMENTED") {
       await context.octokit.pulls.updateReview({
-          owner: context.payload.repository.owner,
-          repo: context.payload.repository.repo,
-          pull_number: context.payload.repository.number,
+          owner: context.payload.repository.owner.login,
+          repo: context.payload.repository.repo.name,
+          pull_number: context.payload.number,
           review_id: review.id,
           body: 'Updated existing review',
       });
@@ -114,9 +113,9 @@ const dismissReview = async (context) => {
   }
   else {
       await context.octokit.pulls.dismissReview({
-          owner: context.payload.repository.owner,
-          repo: context.payload.repository.repo,
-          pull_number: context.payload.repository.number,
+          owner: context.payload.repository.owner.login,
+          repo: context.payload.repository.repo.name,
+          pull_number: context.payload.number,
           review_id: review.id,
           message: 'Dismissed existing review',
       });
