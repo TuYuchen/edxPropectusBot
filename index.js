@@ -36,7 +36,6 @@ module.exports = (app) => {
 
 };
 
-const GITHUB_ACTIONS_LOGIN = "github-actions[bot]";
 
 async function dismissPullRequest (context) {
   // Dismiss the PR
@@ -73,16 +72,11 @@ async function approvePullRequest (context) {
 }
 
 const validateReviews = async (reviews) => {
-  return reviews.find((review) => {
-      return (review.user != null &&
-          isGitHubActionUser(review.user.login) &&
-          hasReviewedState(review.state));
-  });
+  context.log("The review is created by bot", reviews);
+  return reviews.filter((review) => { review.role !==  "BOT"});
 };
 
-const isGitHubActionUser = (login) => {
-  return login === GITHUB_ACTIONS_LOGIN;
-};
+
 
 const hasReviewedState = (state) => {
   return state === "CHANGES_REQUESTED" || state === "COMMENTED";
