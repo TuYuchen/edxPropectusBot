@@ -45,6 +45,7 @@ async function dismissPullRequest (context) {
   let allReviews = await context.octokit.pulls.listReviews(context.pullRequest());
   let rowReviews = allReviews?.data;
   let reviewData = validateReviews(rowReviews)
+  context.log('filtersData', reviewData);
   let ids = []
   if (reviewData?.length > 0) {
     for (let i = 0; i < reviewData.length; i++) {
@@ -71,7 +72,8 @@ async function approvePullRequest (context) {
 }
 
 const validateReviews = async (reviews) => {
-  return reviews.filter((review) => { review.user.type !==  "Bot" && review.state === "APPROVED"});
+  let review = reviews.filter((review) => { review.user.type !==  "Bot" && review.state === "APPROVED"})
+  return review;
 };
 
 const hasReviewedState = (state) => {
