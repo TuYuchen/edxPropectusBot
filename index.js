@@ -77,7 +77,7 @@ module.exports = (app) => {
 
     if (context.isBot) {
       // Ignore update if this issue was created by the bot
-      context.log("This push was created by the bot");
+      context.log("This push was created by the bot.");
       context.log("Execution finished\n\n");
       return;
     }
