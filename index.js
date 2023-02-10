@@ -75,7 +75,7 @@ async function approvePullRequest (context) {
 const getExistingReview = async (context) => {
   const reviews = await context.octokit.pulls.listReviews({
       owner: context.payload.repository.owner.login,
-      repo: context.payload.repository.repo.name,
+      repo: context.payload.repository.name,
       pull_number: context.payload.number,
   });
   context.log(`reviews`, reviews);
@@ -104,7 +104,7 @@ const dismissReview = async (context) => {
   if (review.state === "COMMENTED") {
       await context.octokit.pulls.updateReview({
           owner: context.payload.repository.owner.login,
-          repo: context.payload.repository.repo.name,
+          repo: context.payload.repository.name,
           pull_number: context.payload.number,
           review_id: review.id,
           body: 'Updated existing review',
@@ -114,7 +114,7 @@ const dismissReview = async (context) => {
   else {
       await context.octokit.pulls.dismissReview({
           owner: context.payload.repository.owner.login,
-          repo: context.payload.repository.repo.name,
+          repo: context.payload.repository.name,
           pull_number: context.payload.number,
           review_id: review.id,
           message: 'Dismissed existing review',
