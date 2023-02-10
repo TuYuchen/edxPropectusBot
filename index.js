@@ -6,7 +6,7 @@ module.exports = (app) => {
   // Your code here
   app.log.info("The app was loaded!");
 
-  // Force merge method
+  // Self Approve method
   app.on(["issue_comment.created", "issue_comment.edited"], async (context) => { 
     if (context.isBot) {
       // Ignore comments if this issue was created by the bot=
@@ -74,7 +74,7 @@ module.exports = (app) => {
 
   app.on(["pull_request.opened", "pull_request.edited", "pull_request.synchronize"], async (context) => {
     context.log("The PR was updated recently.");
-
+    // Stale reviews after any updates, exept bots. 
     if (context.isBot) {
       // Ignore update if this issue was created by the bot
       context.log("This push was created by the bot.");
