@@ -74,7 +74,7 @@ async function approvePullRequest (context) {
 }
 
 const getExistingReview = async (context) => {
-  const reviews = await octokit.rest.pulls.listReviews({
+  const reviews = await context.octokit.pulls.listReviews({
       owner: context.payload.repository.owner,
       repo: context.payload.repository.repo,
       pull_number: context.payload.repository.number,
@@ -103,7 +103,7 @@ const dismissReview = async (context) => {
       return;
   }
   if (review.state === "COMMENTED") {
-      await octokit.rest.pulls.updateReview({
+      await context.octokit.pulls.updateReview({
           owner: context.payload.repository.owner,
           repo: context.payload.repository.repo,
           pull_number: context.payload.repository.number,
@@ -113,7 +113,7 @@ const dismissReview = async (context) => {
       context.log(`Updated existing review`);
   }
   else {
-      await octokit.rest.pulls.dismissReview({
+      await context.octokit.pulls.dismissReview({
           owner: context.payload.repository.owner,
           repo: context.payload.repository.repo,
           pull_number: context.payload.repository.number,
