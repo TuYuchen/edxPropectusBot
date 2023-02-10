@@ -95,7 +95,7 @@ async function dismissPullRequest (context) {
   if (reviewData?.length > 0) {
     for (let i = 0; i < reviewData.length; i++) {
       ids.push(reviewData[i].id)
-      if(reviewData[i].state === 'APPROVED' && reviewData[i].user.type === 'User') {
+      if(reviewData[i].state === 'APPROVED') {
         await context.octokit.pulls.dismissReview({
           owner: context.payload.repository.owner.login,
           repo: context.payload.repository.name,
