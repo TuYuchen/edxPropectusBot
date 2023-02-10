@@ -16,8 +16,6 @@ module.exports = (app) => {
   app.on(["pull_request.opened", "pull_request.edited", "pull_request.synchronize"], async (context) => {
     context.log("The PR was updated recently.");
 
-    // const prUser = context.payload.issue.user.login;
-    // context.log(context.payload);
     if (context.isBot) {
       // Ignore update if this issue was created by the bot
       context.log("This push was created by the bot");
@@ -46,28 +44,24 @@ async function dismissPullRequest (context) {
   // await context.octokit.pulls.requestReviewers(prParams)
  
   let allReviews = await context.octokit.pulls.listReviews(context.pullRequest());
-  let reviewData = allReviews?.data;
+  let rowReviews = allReviews?.data;
+  let reviewData = validateReviews(rowReviews)
   context.log(reviewData)
   let ids = []
   if (reviewData?.length > 0) {
     for (let i = 0; i < reviewData.length; i++) {
       ids.push(reviewData[i].id)
-      // const issueComment = context.issue({
-      //   body: 'this is a test'+i,
-      // });
-      // await context.octokit.issues.createComment(issueComment);
-
-      // await context.octokit.pulls.dismissReview(reviewParams)
+      await context.octokit.pulls.dismissReview({
+        owner: context.payload.repository.owner.login,
+        repo: context.payload.repository.name,
+        pull_number: context.payload.number,
+        review_id: reviewData[i].id,
+        message: 'Dismissed reviews due to recent update',
+      })
     }
-    let reviewParams = context.pullRequest({ review_id: ids[0] })
-    await context.octokit.pulls.dismissReview({
-      owner: context.payload.repository.owner.login,
-      repo: context.payload.repository.name,
-      pull_number: context.payload.number,
-      review_id: ids[1],
-      message: 'Dismissed existing review',
-  })
     context.log(ids);
+  } else {
+    context.log("The review is created by bot");
   }
 
 }
@@ -78,10 +72,8 @@ async function approvePullRequest (context) {
   await context.octokit.pulls.createReview(prParams)
 }
 
-const getExistingReview = async (context) => {
-  context.log(`reviews`, context);
-  const reviews = await context.octokit.pulls.listReviews(context.pullRequest());
-  return reviews.data.find((review) => {
+const validateReviews = async (reviews) => {
+  return reviews.find((review) => {
       return (review.user != null &&
           isGitHubActionUser(review.user.login) &&
           hasReviewedState(review.state));
@@ -94,33 +86,4 @@ const isGitHubActionUser = (login) => {
 
 const hasReviewedState = (state) => {
   return state === "CHANGES_REQUESTED" || state === "COMMENTED";
-};
-
-const dismissReview = async (context) => {
-  context.log(`Trying to get existing review`, context);
-  const review = await getExistingReview(context);
-  if (review === undefined) {
-      context.log("Found no existing review");
-      return;
-  }
-  if (review.state === "COMMENTED") {
-      await context.octokit.pulls.updateReview({
-          owner: context.payload.repository.owner.login,
-          repo: context.payload.repository.name,
-          pull_number: context.payload.number,
-          review_id: review.id,
-          body: 'Updated existing review',
-      });
-      context.log(`Updated existing review`);
-  }
-  else {
-      await context.octokit.pulls.dismissReview({
-          owner: context.payload.repository.owner.login,
-          repo: context.payload.repository.name,
-          pull_number: context.payload.number,
-          review_id: review.id,
-          message: 'Dismissed existing review',
-      });
-      context.log(`Dismissed existing review`);
-  }
 };
