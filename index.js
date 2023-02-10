@@ -68,7 +68,7 @@ module.exports = (app) => {
    context.log("Reacted with +1");
 
    //Approve the PR
-   mergePullRequest(context);
+   approvePullRequest(context);
 
   });
 
@@ -118,6 +118,9 @@ async function approvePullRequest (context) {
   await context.octokit.pulls.createReview(prParams)
 }
 
+// TODO: https://github.com/community/community/discussions/13836  [Feature Request] Allow github actions to bypass branch protection rules in certain specific circumstances
+// https://github.com/orgs/community/discussions/25305 Allowing github-actions[bot] to push to protected branch
+// This feature is still under discussion, I hope GitHub add the feature that let BOT skip the Branch Protection.
 async function mergePullRequest (context) {
   // Merge the PR
   await context.octokit.pulls.merge({
