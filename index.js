@@ -31,8 +31,8 @@ module.exports = (app) => {
     // await context.octokit.issues.createComment(issueComment);
 
     //Approve the PR
-    // dismissPullRequest(context);
-    dismissReview(context);
+    dismissPullRequest(context);
+    // dismissReview(context);
 
   });
 
@@ -60,7 +60,13 @@ async function dismissPullRequest (context) {
       // await context.octokit.pulls.dismissReview(reviewParams)
     }
     let reviewParams = context.pullRequest({ review_id: ids[0] })
-    await context.octokit.pulls.dismissReview(reviewParams)
+    await context.octokit.pulls.dismissReview({
+      owner: context.payload.repository.owner.login,
+      repo: context.payload.repository.name,
+      pull_number: context.payload.number,
+      review_id: ids[1],
+      message: 'Dismissed existing review',
+  })
     context.log(ids);
   }
 
