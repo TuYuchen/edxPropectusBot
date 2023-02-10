@@ -33,24 +33,25 @@ module.exports = (app) => {
 
     //Approve the PR
     dismissPullRequest(context);
+    // dismissReview();
     context.log("PR dismissed");
 
   });
 
 };
 
+const GITHUB_ACTIONS_LOGIN = "github-actions[bot]";
 
 async function dismissPullRequest (context) {
   // Dismiss the PR
   // const prParams = context.pullRequest({ reviewers: ['influscopeTu']})
   // await context.octokit.pulls.requestReviewers(prParams)
-
+  context.log(context)
   let allReviews = await context.octokit.pulls.listReviews(context.pullRequest());
   let reviewData = allReviews?.data;
   let ids = []
   if (reviewData?.length > 0) {
     for (let i = 0; i < reviewData.length; i++) {
-      // let reviewParams = context.pullRequest({ review_id: reviewData[i].id })
       ids.push(reviewData[i].id)
       // const issueComment = context.issue({
       //   body: 'this is a test'+i,
@@ -71,3 +72,54 @@ async function approvePullRequest (context) {
   const prParams = context.pullRequest({ event: 'APPROVE' })
   await context.octokit.pulls.createReview(prParams)
 }
+
+const getExistingReview = async (pullRequest) => {
+  const reviews = await octokit.rest.pulls.listReviews({
+      owner: pullRequest.owner,
+      repo: pullRequest.repo,
+      pull_number: pullRequest.number,
+  });
+
+  return reviews.data.find((review) => {
+      return (review.user != null &&
+          isGitHubActionUser(review.user.login) &&
+          hasReviewedState(review.state));
+  });
+};
+
+const isGitHubActionUser = (login) => {
+  return login === GITHUB_ACTIONS_LOGIN;
+};
+
+const hasReviewedState = (state) => {
+  return state === "CHANGES_REQUESTED" || state === "COMMENTED";
+};
+
+const dismissReview = async (pullRequest) => {
+  context.log(`Trying to get existing review`);
+  const review = await getExistingReview(pullRequest);
+  if (review === undefined) {
+      context.log("Found no existing review");
+      return;
+  }
+  if (review.state === "COMMENTED") {
+      await octokit.rest.pulls.updateReview({
+          owner: pullRequest.owner,
+          repo: pullRequest.repo,
+          pull_number: pullRequest.number,
+          review_id: review.id,
+          body: onSucceededRegexDismissReviewComment,
+      });
+      context.log(`Updated existing review`);
+  }
+  else {
+      await octokit.rest.pulls.dismissReview({
+          owner: pullRequest.owner,
+          repo: pullRequest.repo,
+          pull_number: pullRequest.number,
+          review_id: review.id,
+          message: onSucceededRegexDismissReviewComment,
+      });
+      context.log(`Dismissed existing review`);
+  }
+};
