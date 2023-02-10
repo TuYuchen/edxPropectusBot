@@ -68,7 +68,7 @@ module.exports = (app) => {
    context.log("Reacted with +1");
 
    //Approve the PR
-   approvePullRequest(context);
+   mergePullRequest(context);
 
   });
 
@@ -116,4 +116,14 @@ async function approvePullRequest (context) {
   // Approve the PR
   const prParams = context.pullRequest({ event: 'APPROVE' })
   await context.octokit.pulls.createReview(prParams)
+}
+
+async function mergePullRequest (context) {
+  // Merge the PR
+  await context.octokit.pulls.merge({
+    owner: context.payload.repository.owner.login,
+    repo: context.payload.repository.name,
+    pull_number: context.payload.issue.number,
+  })
+  context.log("PR force merged!");
 }
