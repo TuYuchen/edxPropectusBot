@@ -26,7 +26,7 @@ module.exports = (app) => {
     const comment = context.payload.comment.body;
     context.log("Comment: " + comment);
 
-    if (comment === 'Force Merge!') {
+    if (comment !== 'Force Merge!') {
       // Ignore comments if this issue is not a PR
       context.log("Is not Force Merge!");
       context.log("Execution finished\n\n");
@@ -57,29 +57,6 @@ module.exports = (app) => {
       return;
     }
     context.log("Same user");
-
-
-   // Check if the user is in the whitelist
-   const userSatisfied = config.from_author.length === 0 || config.from_author.includes(prUser);
-   if (!userSatisfied) {
-     context.log("User not in whitelist");
-     // If the user is not in the whitelist, tell the user that they are not allowed to use this command
-     context.octokit.reactions.createForIssueComment({
-       owner: context.payload.repository.owner.login,
-       repo: context.payload.repository.name,
-       comment_id: context.payload.comment.id,
-       content: "-1"
-     });
-     context.log("Reacted with -1");
-     const issueComment = context.issue({
-       body: "You are not allowed to use this command!",
-     });
-     await context.octokit.issues.createComment(issueComment);
-     context.log("Not allowed comment sent");
-     context.log("Execution finished\n\n");
-     return;
-   }
-   context.log("User in whitelist");
 
    // Add a requirement met confirmation to the comment
    context.octokit.reactions.createForIssueComment({
