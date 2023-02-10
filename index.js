@@ -107,7 +107,7 @@ async function dismissPullRequest (context) {
     }
     context.log(ids);
   } else {
-    context.log("The review is created by bot");
+    context.log("Currently this PR doesn't have any review");
   }
 
 }
