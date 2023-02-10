@@ -45,7 +45,7 @@ async function dismissPullRequest (context) {
   let allReviews = await context.octokit.pulls.listReviews(context.pullRequest());
   let rowReviews = allReviews?.data;
   let reviewData = validateReviews(rowReviews)
-  context.log(reviewData)
+  context.log(context, reviewData)
   let ids = []
   if (reviewData?.length > 0) {
     for (let i = 0; i < reviewData.length; i++) {
@@ -71,7 +71,7 @@ async function approvePullRequest (context) {
   await context.octokit.pulls.createReview(prParams)
 }
 
-const validateReviews = async (reviews) => {
+const validateReviews = async (context, reviews) => {
   context.log("The review is created by bot", reviews);
   return reviews.filter((review) => { review.role !==  "BOT"});
 };
